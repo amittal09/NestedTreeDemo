@@ -8,7 +8,7 @@ namespace NestedTreeDemo
 {
     public class LabelXMLFile
     {
-        public void ReadFile()
+        public List<IGrouping<string, XmlElement>> ReadFile()
         {
             XDocument document = XDocument.Load($"{AppDomain.CurrentDomain.BaseDirectory}\\labels.xml");
             List<XmlElement> elements = new List<XmlElement>();
@@ -19,28 +19,8 @@ namespace NestedTreeDemo
                 GetChildElements(currentElement, current);
                 elements.Add(current);
             }
-            var data1 = elements.Flatten(x => x.ChildElement ?? new List<XmlElement>()).Select(z => new XmlElement { ResourceKey = z.ResourceKey, Value = z.Value, Language = z.Language }).ToList();
             var data = elements.Flatten(x => x.ChildElement ?? new List<XmlElement>()).Select(z => new XmlElement { ResourceKey = z.ResourceKey, Value = z.Value, Language = z.Language }).Where(x => x.Value != null).GroupBy(x => x.ResourceKey).ToList();
-            StringBuilder stringBuilder = new StringBuilder();
-            foreach (var item in data)
-            {
-                stringBuilder.AppendLine("{");
-                stringBuilder.AppendLine(item.Key);
-                stringBuilder.AppendLine(":");
-                stringBuilder.AppendLine("{");
-                foreach (var item1 in item)
-                {
-                    stringBuilder.AppendLine($"{nameof(item1.ResourceKey)}:{item1.ResourceKey}");
-                    stringBuilder.AppendLine($"{nameof(item1.Language)}:{item1.Language}");
-                    stringBuilder.AppendLine($"{nameof(item1.Value)}:{item1.Value}");
-                }
-            }
-            stringBuilder.Append("}");
-            Console.WriteLine(stringBuilder);
-            Console.ReadLine();
-
-
-            Console.Read();
+            return data;
         }
         public void GetChildElements(XElement element, XmlElement currentElementObjcet)
         {
@@ -65,12 +45,5 @@ namespace NestedTreeDemo
 
 
     }
-    public class XmlElement
-    {
-        public string Name { get; set; }
-        public string Value { get; set; }
-        public string Language { get; set; }
-        public string ResourceKey { get; set; } = "";
-        public List<XmlElement> ChildElement { get; set; }
-    }
+    
 }
